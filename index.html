@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diwali Kolam Selfie</title>
+<meta name="description" content="Take a selfie or food photo with a festive Diwali kolam frame.">
+<meta name="theme-color" content="#1a0b2e">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Yatra+One&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #160822;
+    --gold: #ffd27a;
+    --orange: #ff8c1a;
+    --text: #fbeedd;
+    --muted: #cdb8c9;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: radial-gradient(120% 70% at 50% 0%, #4a1238 0%, var(--bg) 60%) fixed, var(--bg);
+    color: var(--text);
+    font-family: Poppins, system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+  }
+  button { font: inherit; cursor: pointer; border: 0; }
+  .screen { display: none; position: fixed; inset: 0; }
+  .screen.active { display: flex; }
+
+  /* Home */
+  #home { flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px 16px; text-align: center; overflow-y: auto; }
+  #heroCanvas { width: min(88vw, 360px); height: auto; }
+  h1 { font-family: "Yatra One", Georgia, serif; font-weight: 400; color: var(--gold); font-size: clamp(34px, 10vw, 52px); margin: 0; line-height: 1.1; text-shadow: 0 0 24px rgba(255,170,40,.45); }
+  #eventName { color: var(--muted); margin: 0; font-weight: 600; min-height: 1em; }
+  .lead { margin: 0 0 8px; max-width: 30ch; color: var(--text); }
+  .big { width: min(86vw, 340px); padding: 18px 20px; border-radius: 18px; font-size: 20px; font-weight: 600; color: #2a0d00;
+         background: linear-gradient(180deg, #ffd27a, var(--orange)); box-shadow: 0 6px 24px rgba(255,140,26,.35); }
+  .big.alt { background: linear-gradient(180deg, #ffe9b8, #f5b942); }
+  .big:active { transform: scale(.97); }
+  .small { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+
+  /* Camera */
+  #camera { flex-direction: column; align-items: center; justify-content: center; background: #0b0412; }
+  .stageWrap { position: relative; width: min(100vw, calc((100dvh - 170px) * 0.75)); aspect-ratio: 3 / 4; }
+  #stage { width: 100%; height: 100%; display: block; border-radius: 6px; }
+  #hint:empty { display: none; }
+  #hint { position: absolute; left: 50%; top: 14%; transform: translateX(-50%); background: rgba(0,0,0,.55); padding: 6px 14px; border-radius: 99px;
+          font-size: 13px; white-space: nowrap; pointer-events: none; animation: fade 4s forwards; }
+  @keyframes fade { 0%,70% { opacity: 1 } 100% { opacity: 0 } }
+  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+  #flash.go { animation: flash .35s ease-out; }
+  @keyframes flash { from { opacity: .9 } to { opacity: 0 } }
+  #fallback { position: absolute; inset: 22% 10% auto; background: rgba(20,6,30,.92); border: 1px solid var(--gold); border-radius: 16px; padding: 18px; text-align: center; }
+  #fallback p { margin: 0 0 12px; font-size: 15px; }
+  #fallback button { padding: 12px 18px; border-radius: 12px; background: var(--gold); color: #2a0d00; font-weight: 600; }
+  .pals { display: flex; gap: 8px; margin: 10px 0 6px; }
+  .pals button { padding: 7px 14px; border-radius: 99px; background: rgba(255,255,255,.1); color: var(--text); font-size: 14px; border: 1px solid transparent; }
+  .pals button.on { border-color: var(--gold); color: var(--gold); }
+  .bar { display: flex; align-items: center; justify-content: space-between; width: min(100vw, 420px); padding: 4px 28px calc(10px + env(safe-area-inset-bottom)); }
+  .round { width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.12); color: var(--text); font-size: 22px; }
+  #shutter { width: 76px; height: 76px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 5px rgba(255,210,122,.6), 0 0 26px rgba(255,170,40,.6); }
+  #shutter:active { transform: scale(.92); }
+
+  /* Result */
+  #result { flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 12px 16px calc(14px + env(safe-area-inset-bottom)); }
+  #photo { max-width: 100%; max-height: calc(100dvh - 210px); border-radius: 10px; box-shadow: 0 10px 40px rgba(0,0,0,.6); -webkit-touch-callout: default; }
+  #result p { margin: 0; font-size: 13px; color: var(--muted); text-align: center; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .row button { padding: 13px 20px; border-radius: 14px; font-weight: 600; font-size: 16px; }
+  #share, #save { background: linear-gradient(180deg, #ffd27a, var(--orange)); color: #2a0d00; }
+  #again, #home2 { background: rgba(255,255,255,.12); color: var(--text); }
+</style>
+</head>
+<body>
+  <main id="home" class="screen active">
+    <canvas id="heroCanvas" width="600" height="250" aria-hidden="true"></canvas>
+    <h1>Diwali Kolam Selfie</h1>
+    <p id="eventName"></p>
+    <p class="lead">Take a photo with a festive kolam frame. Save it and share the light!</p>
+    <button class="big" data-mode="selfie">🪔 Take a selfie</button>
+    <button class="big alt" data-mode="food">🍛 Photo of your food</button>
+    <p class="small">Your photos stay on your phone. Nothing is uploaded.</p>
+  </main>
+
+  <section id="camera" class="screen" aria-label="Camera">
+    <div class="pals" role="group" aria-label="Frame style">
+      <button data-pal="gold" class="on">Gold</button>
+      <button data-pal="rangoli">Rangoli</button>
+      <button data-pal="classic">Rice flour</button>
+    </div>
+    <div class="stageWrap">
+      <canvas id="stage"></canvas>
+      <div id="hint"></div>
+      <div id="flash"></div>
+      <div id="fallback" hidden>
+        <p>The camera couldn't open in this browser. You can still take a photo with your camera app.</p>
+        <button id="pick">📷 Take or choose a photo</button>
+      </div>
+    </div>
+    <div class="bar">
+      <button id="back" class="round" aria-label="Back">←</button>
+      <button id="shutter" aria-label="Take photo"></button>
+      <button id="flip" class="round" aria-label="Switch camera">⟲</button>
+    </div>
+  </section>
+
+  <section id="result" class="screen" aria-label="Your photo">
+    <img id="photo" alt="Your Diwali kolam photo">
+    <p>Tip: long-press the photo to save it.</p>
+    <div class="row">
+      <button id="share">Share</button>
+      <button id="save">Save</button>
+    </div>
+    <div class="row">
+      <button id="again">Take another</button>
+      <button id="home2">Home</button>
+    </div>
+  </section>
+
+  <input type="file" id="fileIn" accept="image/*" hidden>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
