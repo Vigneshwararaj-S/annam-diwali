@@ -3,24 +3,25 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Diwali Kolam Selfie</title>
+<title>Annam Corner Diwali Selfie</title>
 <meta name="description" content="Take a selfie or food photo with a festive Diwali kolam frame.">
-<meta name="theme-color" content="#1a0b2e">
+<meta name="theme-color" content="#1f2a5c">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Yatra+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #160822;
-    --gold: #ffd27a;
-    --orange: #ff8c1a;
-    --text: #fbeedd;
-    --muted: #cdb8c9;
+    --bg: #141c45;
+    --gold: #f5c242;
+    --orange: #f5a623;
+    --pink: #e8407a;
+    --text: #fff3dc;
+    --muted: #b9c0e0;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; }
   body {
-    background: radial-gradient(120% 70% at 50% 0%, #4a1238 0%, var(--bg) 60%) fixed, var(--bg);
+    background: radial-gradient(120% 70% at 50% 0%, #2c3b7d 0%, var(--bg) 60%) fixed, var(--bg);
     color: var(--text);
     font-family: Poppins, system-ui, sans-serif;
     -webkit-tap-highlight-color: transparent;
@@ -33,17 +34,17 @@
   /* Home */
   #home { flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 24px 16px; text-align: center; overflow-y: auto; }
   #heroCanvas { width: min(88vw, 360px); height: auto; }
-  h1 { font-family: "Yatra One", Georgia, serif; font-weight: 400; color: var(--gold); font-size: clamp(34px, 10vw, 52px); margin: 0; line-height: 1.1; text-shadow: 0 0 24px rgba(255,170,40,.45); }
-  #eventName { color: var(--muted); margin: 0; font-weight: 600; min-height: 1em; }
+  h1 { font-family: "Baloo 2", system-ui, sans-serif; font-weight: 700; color: var(--gold); font-size: clamp(34px, 10vw, 52px); margin: 0; line-height: 1.1; text-shadow: 0 0 24px rgba(255,170,40,.45); }
+  #eventName { font-family: "Baloo 2", system-ui, sans-serif; color: var(--text); font-size: 22px; margin: -6px 0 0; font-weight: 700; min-height: 1em; }
   .lead { margin: 0 0 8px; max-width: 30ch; color: var(--text); }
   .big { width: min(86vw, 340px); padding: 18px 20px; border-radius: 18px; font-size: 20px; font-weight: 600; color: #2a0d00;
-         background: linear-gradient(180deg, #ffd27a, var(--orange)); box-shadow: 0 6px 24px rgba(255,140,26,.35); }
-  .big.alt { background: linear-gradient(180deg, #ffe9b8, #f5b942); }
+         background: linear-gradient(180deg, #ffd45e, var(--gold)); box-shadow: 0 6px 24px rgba(245,194,66,.35); }
+  .big.alt { background: linear-gradient(180deg, #ff5c93, var(--pink)); color: #fff; box-shadow: 0 6px 24px rgba(232,64,122,.35); }
   .big:active { transform: scale(.97); }
   .small { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
 
   /* Camera */
-  #camera { flex-direction: column; align-items: center; justify-content: center; background: #0b0412; }
+  #camera { flex-direction: column; align-items: center; justify-content: center; background: #0c1130; }
   .stageWrap { position: relative; width: min(100vw, calc((100dvh - 170px) * 0.75)); aspect-ratio: 3 / 4; }
   #stage { width: 100%; height: 100%; display: block; border-radius: 6px; }
   #hint:empty { display: none; }
@@ -53,7 +54,7 @@
   #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
   #flash.go { animation: flash .35s ease-out; }
   @keyframes flash { from { opacity: .9 } to { opacity: 0 } }
-  #fallback { position: absolute; inset: 22% 10% auto; background: rgba(20,6,30,.92); border: 1px solid var(--gold); border-radius: 16px; padding: 18px; text-align: center; }
+  #fallback { position: absolute; inset: 22% 10% auto; background: rgba(20,28,69,.94); border: 1px solid var(--gold); border-radius: 16px; padding: 18px; text-align: center; }
   #fallback p { margin: 0 0 12px; font-size: 15px; }
   #fallback button { padding: 12px 18px; border-radius: 12px; background: var(--gold); color: #2a0d00; font-weight: 600; }
   .pals { display: flex; gap: 8px; margin: 10px 0 6px; }
@@ -70,7 +71,7 @@
   #result p { margin: 0; font-size: 13px; color: var(--muted); text-align: center; }
   .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
   .row button { padding: 13px 20px; border-radius: 14px; font-weight: 600; font-size: 16px; }
-  #share, #save { background: linear-gradient(180deg, #ffd27a, var(--orange)); color: #2a0d00; }
+  #share, #save { background: linear-gradient(180deg, #ffd45e, var(--gold)); color: #1f2a5c; }
   #again, #home2 { background: rgba(255,255,255,.12); color: var(--text); }
 </style>
 </head>
@@ -87,7 +88,8 @@
 
   <section id="camera" class="screen" aria-label="Camera">
     <div class="pals" role="group" aria-label="Frame style">
-      <button data-pal="gold" class="on">Gold</button>
+      <button data-pal="annam" class="on">Annam</button>
+      <button data-pal="gold">Gold</button>
       <button data-pal="rangoli">Rangoli</button>
       <button data-pal="classic">Rice flour</button>
     </div>

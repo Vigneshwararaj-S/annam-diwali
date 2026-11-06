@@ -6,14 +6,16 @@ const $ = (s) => document.querySelector(s);
 const params = new URLSearchParams(location.search);
 const EVENT = {
   title: params.get('t') || 'Happy Diwali',
-  foodTitle: params.get('ft') || 'Diwali Feast',
-  name: params.get('e') || '',
-  tag: params.get('h') ?? '#DiwaliKolam',
+  foodTitle: params.get('ft') || 'Taste home here!',
+  name: params.get('e') ?? 'Annam Corner',
+  line: params.get('l') ?? 'Taste home here.',
+  tag: params.get('h') ?? '#AnnamCorner',
 };
 
 const W = 1080, H = 1440; // output photo size (3:4 portrait)
 
 const PALETTES = {
+  annam: { band: ['#1f2a5c', '#141c45'], line: ['#f5c242'], flower: '#ff5c93', dot: '#fff6e0', rim: '#f5c242', text: '#fff3dc', sub: '#f5c242' },
   gold: { band: ['#2b0b3f', '#4a0f2e'], line: ['#ffd27a'], dot: '#fff4d6', rim: '#f5b942', text: '#ffd27a', sub: '#fde9c4' },
   rangoli: { band: ['#21063a', '#08324a'], line: ['#ff4f9a', '#ffd23f', '#35e0a1', '#53c7ff'], dot: '#ffffff', rim: '#ff4f9a', text: '#ffd23f', sub: '#ffffff' },
   classic: { band: ['#3a1a0c', '#1f0e08'], line: ['#ffffff'], dot: '#ffffff', rim: '#ffffff', text: '#ffffff', sub: '#f4e6d4' },
@@ -57,7 +59,7 @@ function buildOverlay(mode, p) {
   K.chain(ctx, W - T / 2, T, W - T / 2, y0, s, a, lc(p, 2), p.dot, lw);
   K.chain(ctx, T, y0 + T / 2, W - T, y0 + T / 2, s, a, lc(p, 3), p.dot, lw);
   for (const [x, y] of [[T / 2, T / 2], [W - T / 2, T / 2], [T / 2, y0 + T / 2], [W - T / 2, y0 + T / 2]]) {
-    K.flower(ctx, x, y, T * 0.46, lc(p, 0), p.dot, 3);
+    K.flower(ctx, x, y, T * 0.46, p.flower || lc(p, 0), p.dot, 3);
   }
 
   // Food mode: kolam ring for the plate, drawn with a soft shadow so it shows on any food
@@ -76,7 +78,7 @@ function buildOverlay(mode, p) {
     }
     for (let i = 0; i < 8; i++) {
       const th = (i / 8) * Math.PI * 2 + Math.PI / 8;
-      K.flower(ctx, cx + (R + 48) * Math.cos(th), cy + (R + 48) * Math.sin(th), 22, lc(p, i + 1), p.dot, 3, 6);
+      K.flower(ctx, cx + (R + 48) * Math.cos(th), cy + (R + 48) * Math.sin(th), 22, p.flower || lc(p, i + 1), p.dot, 3, 6);
     }
     ctx.restore();
   }
@@ -97,10 +99,10 @@ function buildOverlay(mode, p) {
   ctx.shadowColor = 'rgba(255,170,40,0.65)';
   ctx.shadowBlur = 22;
   ctx.fillStyle = p.text;
-  ctx.font = `${food ? 76 : 86}px "Yatra One", Georgia, serif`;
+  ctx.font = `700 ${food ? 80 : 90}px "Baloo 2", system-ui, sans-serif`;
   ctx.fillText(food ? EVENT.foodTitle : EVENT.title, W / 2, y0 + (food ? 142 : 160));
   ctx.restore();
-  const sub = [EVENT.name, EVENT.tag].filter(Boolean).join('   •   ');
+  const sub = [EVENT.name, food ? EVENT.tag : EVENT.line].filter(Boolean).join('   •   ');
   if (sub) {
     ctx.fillStyle = p.sub;
     ctx.font = `600 ${food ? 30 : 32}px Poppins, system-ui, sans-serif`;
@@ -137,7 +139,7 @@ video.setAttribute('playsinline', '');
 
 let mode = 'selfie';
 let facing = 'user';
-let paletteKey = 'gold';
+let paletteKey = 'annam';
 let overlay = null;
 let stream = null;
 let still = null;       // fallback photo (from file picker)
@@ -271,7 +273,7 @@ function canShareFiles() {
 
 $('#share').addEventListener('click', async () => {
   try {
-    await navigator.share({ files: [photoFile()], title: EVENT.title, text: `${EVENT.title}! ${EVENT.tag}`.trim() });
+    await navigator.share({ files: [photoFile()], title: EVENT.title, text: `${EVENT.title} from ${EVENT.name}! ${EVENT.tag}`.trim() });
   } catch (e) { if (e.name !== 'AbortError') save(); }
 });
 function save() {
@@ -294,22 +296,22 @@ function hero(now) {
   if (!$('#home').classList.contains('active')) { requestAnimationFrame(hero); return; }
   const t = now / 1000;
   hx.clearRect(0, 0, hc.width, hc.height);
-  K.chain(hx, 20, 210, 580, 210, 56, 16, '#ffd27a', '#fff4d6', 3.5);
+  K.chain(hx, 20, 210, 580, 210, 56, 16, '#f5c242', '#fff6e0', 3.5);
   const f1 = K.diya(hx, 180, 150, 40, false);
   const f2 = K.diya(hx, 420, 150, 40, true);
   K.flame(hx, f1.x, f1.y, f1.s, t);
   K.flame(hx, f2.x, f2.y, f2.s, t + 1.3);
-  K.flower(hx, 300, 120, 34, '#ff9f43', '#fff4d6', 3);
+  K.flower(hx, 300, 120, 34, '#ff5c93', '#fff6e0', 3);
   requestAnimationFrame(hero);
 }
 
 // Wait for fonts so the title draws in the festive font
 const fontsReady = Promise.race([
-  Promise.all([document.fonts.load('86px "Yatra One"'), document.fonts.load('600 32px Poppins')]),
+  Promise.all([document.fonts.load('700 90px "Baloo 2"'), document.fonts.load('600 32px Poppins')]),
   new Promise((r) => setTimeout(r, 2500)),
 ]).catch(() => {});
 fontsReady.then(() => { if (overlay) rebuildOverlay(); });
-if (EVENT.name) $('#eventName').textContent = EVENT.name;
+if (EVENT.name) $('#eventName').textContent = 'at ' + EVENT.name;
 requestAnimationFrame(hero);
 
 // Test hook: ?demo=selfie or ?demo=food draws the frame over a sample image (no camera needed)
@@ -317,7 +319,7 @@ const demo = params.get('demo');
 if (demo) {
   fontsReady.then(() => {
     mode = demo === 'food' ? 'food' : 'selfie';
-    paletteKey = params.get('pal') || 'gold';
+    paletteKey = params.get('pal') || 'annam';
     rebuildOverlay();
     const img = new Image();
     img.onload = () => { still = img; show('camera'); startLoop(); };

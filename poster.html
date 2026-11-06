@@ -3,30 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kolam Selfie Poster</title>
+<title>Annam Selfie Poster</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Yatra+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <style>
   @page { size: A4 portrait; margin: 0; }
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   html, body { margin: 0; background: #555; }
   .sheet { position: relative; width: 210mm; height: 297mm; margin: 10mm auto; overflow: hidden; color: #fbeedd;
-           background: radial-gradient(120% 60% at 50% 0%, #5a1640 0%, #1b0929 65%); font-family: Poppins, system-ui, sans-serif; }
+           background: radial-gradient(120% 60% at 50% 0%, #2c3b7d 0%, #1f2a5c 45%, #141c45 100%); font-family: Poppins, system-ui, sans-serif; }
   #border { position: absolute; inset: 0; width: 100%; height: 100%; }
   .content { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding: 40mm 22mm 30mm; text-align: center; }
-  h1 { font-family: "Yatra One", Georgia, serif; font-weight: 400; color: #ffd27a; font-size: 21mm; line-height: 1; margin: 0;
-       text-shadow: 0 0 8mm rgba(255,170,40,.5); }
-  .ev { font-weight: 600; font-size: 6mm; margin: 3mm 0 0; color: #fde9c4; min-height: 6mm; }
-  .qr { margin: 8mm 0 5mm; background: #fff; padding: 5mm; border-radius: 5mm; box-shadow: 0 0 0 1.6mm #ffd27a, 0 0 12mm rgba(255,170,40,.55); }
+  .top { font-family: "Baloo 2", system-ui, sans-serif; font-weight: 700; color: #f5c242; font-size: 8mm; margin: 0 0 1mm; }
+  h1 { font-family: "Baloo 2", system-ui, sans-serif; font-weight: 700; color: #fff3dc; font-size: 22mm; line-height: .95; margin: 0;
+       text-shadow: 0 0 8mm rgba(245,194,66,.35); }
+  .ev { font-family: "Baloo 2", system-ui, sans-serif; font-weight: 700; font-size: 8mm; margin: 2mm 0 0; color: #ff5c93; min-height: 6mm; }
+  .qr { margin: 8mm 0 5mm; background: #fff; padding: 5mm; border-radius: 5mm; box-shadow: 0 0 0 1.6mm #f5c242, 0 0 12mm rgba(245,194,66,.5); }
   .qr svg, .qr img { display: block; width: 78mm; height: 78mm; }
-  .scan { font-family: "Yatra One", Georgia, serif; font-size: 11mm; color: #ffd27a; margin: 0; }
+  .scan { font-family: "Baloo 2", system-ui, sans-serif; font-weight: 700; font-size: 12mm; color: #f5c242; margin: 0; }
   .steps { display: flex; gap: 6mm; margin-top: 7mm; font-size: 4.6mm; }
   .steps div { width: 46mm; }
   .steps b { display: block; font-size: 9mm; }
-  .note { position: absolute; bottom: 21mm; left: 0; right: 0; text-align: center; font-size: 3.6mm; color: #cdb8c9; }
-  .url { position: absolute; bottom: 15mm; left: 50mm; right: 50mm; text-align: center; font-size: 3mm; color: #a993a6; word-break: break-all; }
+  .note { position: absolute; bottom: 21mm; left: 0; right: 0; text-align: center; font-size: 3.6mm; color: #b9c0e0; }
+  .url { position: absolute; bottom: 15mm; left: 50mm; right: 50mm; text-align: center; font-size: 3mm; color: #8f98c4; word-break: break-all; }
   @media print { html, body { background: none; } .sheet { margin: 0; } .noprint { display: none; } }
   .noprint { text-align: center; color: #fff; font: 14px system-ui; padding: 10px; }
 </style>
@@ -36,13 +37,14 @@
   <div class="sheet">
     <canvas id="border" width="1240" height="1754"></canvas>
     <div class="content">
-      <h1>Diwali Kolam Selfie</h1>
+      <p class="top">Happy Diwali!</p>
+      <h1>Kolam Selfie</h1>
       <p class="ev" id="ev"></p>
       <div class="qr" id="qr"></div>
       <p class="scan">Scan • Smile • Share</p>
       <div class="steps">
         <div><b>📷</b>Scan the code with your phone camera</div>
-        <div><b>🪔</b>Pick a frame: selfie or your food</div>
+        <div><b>🪔</b>Take a selfie or a photo of your food</div>
         <div><b>✨</b>Save it and share the light</div>
       </div>
     </div>
@@ -52,15 +54,15 @@
 <script type="module">
   import * as K from './kolam.js';
   const params = new URLSearchParams(location.search);
-  const ev = params.get('e') || '';
+  const ev = params.get('e') ?? 'Annam Corner';
   // The QR points to the selfie page next to this poster (or to ?url=...)
   let target = params.get('url');
   if (!target) {
     const u = new URL('./', location.href);
-    if (ev) u.searchParams.set('e', ev);
+    if (params.has('e')) u.searchParams.set('e', ev);
     target = u.href;
   }
-  document.getElementById('ev').textContent = ev;
+  document.getElementById('ev').textContent = ev ? 'at ' + ev : '';
   document.getElementById('url').textContent = target;
 
   const qr = qrcode(0, 'M');
@@ -72,14 +74,14 @@
   const c = document.getElementById('border');
   const ctx = c.getContext('2d');
   const W = c.width, H = c.height, T = 70;
-  const p = { line: ['#ffd27a', '#ff9f43'], dot: '#fff4d6' };
-  ctx.strokeStyle = '#f5b942'; ctx.lineWidth = 5;
+  const p = { line: ['#f5c242', '#f5c242'], dot: '#fff6e0', flower: '#ff5c93' };
+  ctx.strokeStyle = '#f5c242'; ctx.lineWidth = 5;
   ctx.beginPath(); K.roundRectPath(ctx, T, T, W - 2 * T, H - 2 * T, 30); ctx.stroke();
   K.chain(ctx, T, T / 2, W - T, T / 2, 58, 17, p.line[0], p.dot, 4);
   K.chain(ctx, T, H - T / 2, W - T, H - T / 2, 58, 17, p.line[0], p.dot, 4);
   K.chain(ctx, T / 2, T, T / 2, H - T, 58, 17, p.line[1], p.dot, 4);
   K.chain(ctx, W - T / 2, T, W - T / 2, H - T, 58, 17, p.line[1], p.dot, 4);
-  for (const [x, y] of [[T / 2, T / 2], [W - T / 2, T / 2], [T / 2, H - T / 2], [W - T / 2, H - T / 2]]) K.flower(ctx, x, y, 32, p.line[0], p.dot, 3);
+  for (const [x, y] of [[T / 2, T / 2], [W - T / 2, T / 2], [T / 2, H - T / 2], [W - T / 2, H - T / 2]]) K.flower(ctx, x, y, 32, p.flower, p.dot, 3);
   K.garland(ctx, T + 10, W - T - 10, T + 4, 60, 5, 16);
   const flames = [K.diya(ctx, 190, H - 135, 52, false), K.diya(ctx, W - 190, H - 135, 52, true)];
   for (const f of flames) K.flame(ctx, f.x, f.y, f.s, 0.4);
