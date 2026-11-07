@@ -22,6 +22,131 @@ const PALETTES = {
 };
 const lc = (p, i) => p.line[i % p.line.length];
 
+// ---- Personal touches ----
+const TITLES = {
+  en: { t: 'Happy Diwali', f: 'Taste home here!' },
+  ta: { t: 'தீபாவளி வாழ்த்துகள்', f: 'வீட்டுச் சுவை இங்கே!' },
+  hi: { t: 'शुभ दीपावली', f: 'घर का स्वाद यहाँ!' },
+  sv: { t: 'Glad Diwali', f: 'Smaken av hemmet!' },
+};
+const FORTUNES = {
+  en: [
+    'Your year will be as sweet as Ashoka Halwa',
+    'Success will rise like a hot bajji',
+    'Good news is brewing, like masala chai',
+    'Your luck is stuffed full, like an aloo paratha',
+    'Joy will come in layers, like a Bombay sandwich',
+    'Your home will glow brighter than a hundred diyas',
+    'Sweet surprises are coming your way',
+    'Friends and good food will fill your year',
+  ],
+  ta: [
+    'உங்கள் ஆண்டு அசோகா அல்வா போல இனிக்கும்',
+    'வெற்றி சூடான பஜ்ஜி போல உப்பி எழும்',
+    'நல்ல செய்தி மசாலா டீ போல கொதிக்கிறது',
+    'அதிர்ஷ்டம் ஆலு பராத்தா போல நிறைந்திருக்கும்',
+    'மகிழ்ச்சி அடுக்கடுக்காய் வரும்',
+    'நூறு தீபங்களை விட உங்கள் வீடு ஒளிரும்',
+    'இனிய ஆச்சரியங்கள் உங்களைத் தேடி வரும்',
+    'நண்பர்களும் நல்ல உணவும் உங்கள் ஆண்டை நிரப்பும்',
+  ],
+  hi: [
+    'आपका साल अशोका हलवे जैसा मीठा हो',
+    'सफलता गरम पकौड़े की तरह फूलेगी',
+    'अच्छी खबर मसाला चाय की तरह उबल रही है',
+    'आपकी किस्मत आलू पराठे की तरह भरी रहे',
+    'खुशियाँ परत दर परत आएँगी',
+    'आपका घर सौ दीयों से भी ज़्यादा चमके',
+    'मीठे सरप्राइज़ आपकी राह में हैं',
+    'दोस्त और अच्छा खाना आपका साल भर दें',
+  ],
+  sv: [
+    'Ditt år blir lika sött som Ashoka Halwa',
+    'Framgången växer som en het bajji',
+    'Goda nyheter puttrar, som masala chai',
+    'Din tur är välfylld, som en aloo paratha',
+    'Glädjen kommer lager på lager',
+    'Ditt hem lyser starkare än hundra diyor',
+    'Söta överraskningar är på väg',
+    'Vänner och god mat fyller ditt år',
+  ],
+};
+const sessionSeed = (Math.random() * 4294967296) >>> 0;
+const S = {
+  lang: 'en',
+  dish: '',
+  name: '',
+  fortune: Math.floor(Math.random() * 8),
+  get seed() { return this.name.trim() ? K.hashName(this.name) : sessionSeed; },
+};
+const FONT = '"Baloo 2", "Baloo Thambi 2", system-ui, sans-serif';
+
+function fitFont(ctx, text, weight, size, min, maxW) {
+  ctx.font = `${weight} ${size}px ${FONT}`;
+  while (ctx.measureText(text).width > maxW && size > min) {
+    size -= 2;
+    ctx.font = `${weight} ${size}px ${FONT}`;
+  }
+  return size;
+}
+
+function drawBadge(ctx, x, y, r, dish) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-0.18);
+  ctx.shadowColor = 'rgba(0,0,0,0.45)';
+  ctx.shadowBlur = 14;
+  ctx.fillStyle = '#e8407a';
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = '#fff3dc';
+  ctx.lineWidth = 3;
+  ctx.setLineDash([9, 7]);
+  ctx.beginPath(); ctx.arc(0, 0, r - 11, 0, Math.PI * 2); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#fff3dc';
+  ctx.font = `600 ${Math.round(r * 0.22)}px Poppins, system-ui, sans-serif`;
+  ctx.fillText('I TRIED', 0, -r * 0.48);
+  const maxW = r * 1.5;
+  ctx.font = `700 ${Math.round(r * 0.4)}px ${FONT}`;
+  const lines = ctx.measureText(dish).width > maxW && dish.includes(' ')
+    ? [dish.slice(0, dish.indexOf(' ')), dish.slice(dish.indexOf(' ') + 1)]
+    : [dish];
+  const size = Math.min(...lines.map((l) => fitFont(ctx, l, 700, Math.round(r * 0.4), 14, maxW)));
+  ctx.font = `700 ${size}px ${FONT}`;
+  ctx.fillStyle = '#ffffff';
+  const lh = size * 0.95;
+  lines.forEach((l, i) => ctx.fillText(l, 0, (i - (lines.length - 1) / 2) * lh + r * 0.02));
+  ctx.fillStyle = '#ffd45e';
+  ctx.font = `700 ${Math.round(r * 0.22)}px ${FONT}`;
+  ctx.fillText('✓ YUM!', 0, r * 0.52);
+  ctx.restore();
+}
+
+function drawFortune(ctx, text, cx, cy, maxW) {
+  const size = fitFont(ctx, text, 600, 34, 20, maxW - 70);
+  const w = ctx.measureText(text).width + 70, h = size + 30;
+  ctx.save();
+  ctx.fillStyle = 'rgba(20,28,69,0.86)';
+  ctx.strokeStyle = '#f5c242';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  K.roundRectPath(ctx, cx - w / 2, cy - h / 2, w, h, h / 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#fff3dc';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, cx, cy + 2);
+  K.sparkle(ctx, cx - w / 2 + 8, cy - h / 2 + 4, 12, 1, '#ffd45e');
+  K.sparkle(ctx, cx + w / 2 - 6, cy + h / 2 - 6, 9, 1, '#ffd45e');
+  ctx.restore();
+}
+
+const EMBLEM_COLORS = { bg: 'rgba(20,28,69,0.88)', rim: '#f5c242', line: '#f5c242', line2: '#ff5c93', dot: '#fff6e0' };
+
 // ---- Frame overlay (drawn once per mode/palette, then reused every frame) ----
 function buildOverlay(mode, p) {
   const c = document.createElement('canvas');
@@ -52,14 +177,18 @@ function buildOverlay(mode, p) {
   K.roundRectPath(ctx, T, T, W - 2 * T, y0 - T, 30);
   ctx.stroke();
 
-  // Kolam chains around the band
-  const s = food ? 50 : 56, a = food ? 15 : 17, lw = 4;
+  // Kolam chains around the band (spacing, height and corner petals vary with the name)
+  const seed = S.seed;
+  const s = (food ? 50 : 56) + ((seed % 3) - 1) * 6;
+  const a = (food ? 15 : 17) + ((seed >> 3) % 3) * 2 - 2;
+  const lw = 4;
+  const petals = 5 + ((seed >> 6) % 5);
   K.chain(ctx, T, T / 2, W - T, T / 2, s, a, lc(p, 0), p.dot, lw);
   K.chain(ctx, T / 2, T, T / 2, y0, s, a, lc(p, 1), p.dot, lw);
   K.chain(ctx, W - T / 2, T, W - T / 2, y0, s, a, lc(p, 2), p.dot, lw);
   K.chain(ctx, T, y0 + T / 2, W - T, y0 + T / 2, s, a, lc(p, 3), p.dot, lw);
   for (const [x, y] of [[T / 2, T / 2], [W - T / 2, T / 2], [T / 2, y0 + T / 2], [W - T / 2, y0 + T / 2]]) {
-    K.flower(ctx, x, y, T * 0.46, p.flower || lc(p, 0), p.dot, 3);
+    K.flower(ctx, x, y, T * 0.46, p.flower || lc(p, 0), p.dot, 3, petals);
   }
 
   // Food mode: kolam ring for the plate, drawn with a soft shadow so it shows on any food
@@ -92,6 +221,13 @@ function buildOverlay(mode, p) {
   flames.push(K.diya(ctx, 130, dy, ds, false));
   flames.push(K.diya(ctx, W - 130, dy, ds, true));
 
+  // Name kolam (top-left), dish badge (top-right), fortune ribbon (bottom of the photo)
+  const topY = T + (food ? 150 : 185);
+  K.nameKolam(ctx, T + 105, topY, 92, seed, EMBLEM_COLORS);
+  if (S.dish) drawBadge(ctx, W - T - 105, topY, 92, S.dish);
+  const fortunes = FORTUNES[S.lang];
+  drawFortune(ctx, fortunes[S.fortune % fortunes.length], W / 2, y0 - 58, W - 2 * T - 40);
+
   // Title and event line
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
@@ -99,8 +235,10 @@ function buildOverlay(mode, p) {
   ctx.shadowColor = 'rgba(255,170,40,0.65)';
   ctx.shadowBlur = 22;
   ctx.fillStyle = p.text;
-  ctx.font = `700 ${food ? 80 : 90}px "Baloo 2", system-ui, sans-serif`;
-  ctx.fillText(food ? EVENT.foodTitle : EVENT.title, W / 2, y0 + (food ? 142 : 160));
+  const tt = TITLES[S.lang];
+  const title = food ? (params.get('ft') || tt.f) : (params.get('t') || tt.t);
+  fitFont(ctx, title, 700, food ? 80 : 90, 40, W - 2 * 215);
+  ctx.fillText(title, W / 2, y0 + (food ? 142 : 160));
   ctx.restore();
   const sub = [EVENT.name, food ? EVENT.tag : EVENT.line].filter(Boolean).join('   •   ');
   if (sub) {
@@ -115,8 +253,8 @@ function buildOverlay(mode, p) {
   }
 
   // Twinkle positions inside the band
-  let seed = 7;
-  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  let tw = 7;
+  const rnd = () => ((tw = (tw * 16807) % 2147483647) / 2147483647);
   for (let i = 0; i < 26; i++) {
     const side = i % 3;
     let x, y;
@@ -247,6 +385,11 @@ document.querySelectorAll('[data-pal]').forEach((b) => b.addEventListener('click
   rebuildOverlay();
 }));
 
+$('#dice').addEventListener('click', () => {
+  S.fortune = (S.fortune + 1 + Math.floor(Math.random() * 6)) % 8;
+  rebuildOverlay();
+});
+
 $('#shutter').addEventListener('click', () => {
   if (!still && !video.videoWidth) { showFallback(); return; }
   drawScene(performance.now() / 1000);
@@ -305,9 +448,37 @@ function hero(now) {
   requestAnimationFrame(hero);
 }
 
+// ---- Home screen: personal choices ----
+const pk = $('#nameKolam');
+const pkx = pk.getContext('2d');
+function drawNamePreview() {
+  pkx.clearRect(0, 0, pk.width, pk.height);
+  K.nameKolam(pkx, pk.width / 2, pk.height / 2, pk.width / 2 - 4, S.seed, EMBLEM_COLORS);
+}
+$('#nameIn').addEventListener('input', (e) => { S.name = e.target.value; drawNamePreview(); });
+function chipGroup(sel, attr, onPick) {
+  document.querySelectorAll(sel).forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll(sel).forEach((x) => x.classList.toggle('on', x === b));
+    onPick(b.getAttribute(attr));
+  }));
+}
+chipGroup('[data-lang]', 'data-lang', (v) => { S.lang = v; fontsFor(v).then(() => { if (overlay) rebuildOverlay(); }); });
+chipGroup('[data-dish]', 'data-dish', (v) => { S.dish = v; });
+drawNamePreview();
+
 // Wait for fonts so the title draws in the festive font
+function fontsFor(lang) {
+  const sample = { ta: 'தீபாவளி', hi: 'शुभ दीपावली' }[lang] || 'Diwali';
+  return Promise.race([
+    Promise.all([
+      document.fonts.load(`700 90px ${FONT}`, sample),
+      document.fonts.load(`600 34px ${FONT}`, sample),
+    ]),
+    new Promise((r) => setTimeout(r, 2500)),
+  ]).catch(() => {});
+}
 const fontsReady = Promise.race([
-  Promise.all([document.fonts.load('700 90px "Baloo 2"'), document.fonts.load('600 32px Poppins')]),
+  Promise.all([fontsFor('en'), document.fonts.load('600 32px Poppins')]),
   new Promise((r) => setTimeout(r, 2500)),
 ]).catch(() => {});
 fontsReady.then(() => { if (overlay) rebuildOverlay(); });
@@ -317,7 +488,11 @@ requestAnimationFrame(hero);
 // Test hook: ?demo=selfie or ?demo=food draws the frame over a sample image (no camera needed)
 const demo = params.get('demo');
 if (demo) {
-  fontsReady.then(() => {
+  S.lang = params.get('lang') || 'en';
+  S.dish = params.get('dish') || '';
+  S.name = params.get('name') || 'Priya';
+  S.fortune = 0;
+  Promise.all([fontsReady, fontsFor(S.lang)]).then(() => {
     mode = demo === 'food' ? 'food' : 'selfie';
     paletteKey = params.get('pal') || 'annam';
     rebuildOverlay();

@@ -239,3 +239,121 @@ export function roundRectPath(ctx, x, y, w, h, r) {
   ctx.arcTo(x, y, x + w, y, r);
   ctx.closePath();
 }
+
+// ---- Name kolam: a symmetric dot-grid kolam generated from a seed ----
+
+export function hashName(str) {
+  let h = 2166136261;
+  for (const ch of str.trim().toLowerCase()) {
+    h ^= ch.codePointAt(0);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+export function rng(seed) {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function teardrop(ctx, L, w) {
+  ctx.beginPath();
+  ctx.moveTo(L, 0);
+  ctx.bezierCurveTo(L * 0.4, -w * 1.1, -w * 1.3, -w * 1.1, -w * 1.3, 0);
+  ctx.bezierCurveTo(-w * 1.3, w * 1.1, L * 0.4, w * 1.1, L, 0);
+  ctx.stroke();
+}
+
+// col: { bg, rim, line, line2, dot }
+export function nameKolam(ctx, cx, cy, R, seed, col) {
+  const r = rng(seed);
+  const n = 3 + Math.floor(r() * 3);          // 3, 4 or 5 dots per side
+  const diamond = r() < 0.5;                   // grid turned 45 degrees
+  const half = R * (diamond ? 0.5 : 0.44);
+  const g = (2 * half) / (n - 1);
+  const lw = Math.max(2, R * 0.035);
+  const table = {};
+  const pick = (key) => (table[key] ??= Math.floor(r() * 5));
+  const connect = r() < 0.55;
+  const ringN = 2 * (8 + Math.floor(r() * 7));
+
+  ctx.save();
+  // disc
+  ctx.fillStyle = col.bg;
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = col.rim;
+  ctx.lineWidth = lw * 1.3;
+  ctx.stroke();
+  ring(ctx, cx, cy, R * 0.86, ringN, R * 0.045, col.line2, col.dot, lw * 0.7);
+
+  ctx.translate(cx, cy);
+  if (diamond) ctx.rotate(Math.PI / 4);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = lw;
+  const c = (n - 1) / 2;
+
+  // lens links between neighbouring dots
+  if (connect) {
+    ctx.strokeStyle = col.line2;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const x = (i - c) * g, y = (j - c) * g;
+      for (const [dx, dy] of [[1, 0], [0, 1]]) {
+        if (i + dx >= n || j + dy >= n) continue;
+        const mx = x + (dx * g) / 2, my = y + (dy * g) / 2;
+        const ox = dy * g * 0.22, oy = dx * g * 0.22;
+        ctx.beginPath();
+        ctx.moveTo(mx - dx * g * 0.22, my - dy * g * 0.22);
+        ctx.quadraticCurveTo(mx + ox, my + oy, mx + dx * g * 0.22, my + dy * g * 0.22);
+        ctx.quadraticCurveTo(mx - ox, my - oy, mx - dx * g * 0.22, my - dy * g * 0.22);
+        ctx.stroke();
+      }
+    }
+  }
+
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    const di = i - c, dj = j - c;
+    const x = di * g, y = dj * g;
+    const a = Math.abs(di), b = Math.abs(dj);
+    const key = `${Math.min(a, b)},${Math.max(a, b)}`;
+    const type = pick(key);
+    ctx.strokeStyle = (a + b) % 2 < 1 ? col.line : col.line2;
+    ctx.save();
+    ctx.translate(x, y);
+    const center = a === 0 && b === 0;
+    if (!center) ctx.rotate(Math.atan2(y, x));
+    const s = g * 0.42;
+    if (center) {
+      flower(ctx, 0, 0, g * 0.85, col.line, col.dot, lw * 0.8, 8);
+    } else if (type === 0) {
+      ctx.beginPath(); ctx.arc(0, 0, s * 0.85, 0, Math.PI * 2); ctx.stroke();
+    } else if (type === 1) {
+      teardrop(ctx, s * 1.45, s * 0.55);
+    } else if (type === 2) {
+      ctx.rotate(Math.PI); teardrop(ctx, s * 1.45, s * 0.55);
+    } else if (type === 3) {
+      ctx.beginPath();
+      ctx.moveTo(s, 0);
+      ctx.quadraticCurveTo(s * 0.15, s * 0.15, 0, s);
+      ctx.quadraticCurveTo(-s * 0.15, s * 0.15, -s, 0);
+      ctx.quadraticCurveTo(-s * 0.15, -s * 0.15, 0, -s);
+      ctx.quadraticCurveTo(s * 0.15, -s * 0.15, s, 0);
+      ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.arc(0, 0, s * 0.9, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, s * 0.5, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.restore();
+    ctx.fillStyle = col.dot;
+    ctx.beginPath(); ctx.arc(x, y, lw * 0.9, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+}
